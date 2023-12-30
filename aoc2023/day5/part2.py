@@ -1,21 +1,53 @@
+from random import seed
+import typing
 
+
+def to_int_tuple(input: str):
+    return [int(num) for num in input.split(' ')]
+
+def sort_by_second_items(arr_of_objs: typing.List[typing.List]):
+    return arr_of_objs.sort(key=lambda x: x[1])
+
+def parse_map(input, line_number):
+    arr = []
+    while line_number < len(input) and input[line_number] != '':
+        arr.append(to_int_tuple(input[line_number]))
+        line_number += 1
+    sort_by_second_items(arr)
+    line_number += 2
+    return arr, line_number
+
+def convert_num(num, sorted_map):
+    for section in sorted_map:
+        if num < section[1]:
+            return num
+        if num >= section[1] and num < section[1] + section[2]:
+            return num + section[0] - section[1]
+    return num
+
+def convert_arr(arr, sorted_map): 
+    arr = list(set(arr))
+    return [convert_num(num, sorted_map) for num in arr]
 
 def solve(input):
-    card_instances = [1] * 186
-    for i, line in enumerate(input):
-        tokens = line.split(' ')
-        winning = set()
-        checking = False
-        point = 0
-        for token in tokens[2:]:
-            if token == '':
-                continue
-            elif token == '|':
-                checking = True
-            elif checking:
-                point += token in winning
-            else:
-                winning.add(token)
-        for j in range(i + 1, min(186, i + 1 + point)):
-            card_instances[j] += card_instances[i]
-    return sum(card_instances)
+    i = 0
+    seed_pairs = [int(num) for num in input[0].split(' ')[1:]]
+    seeds = []
+    for i in range(0, len(seed_pairs) - 1, 2):
+        seeds.extend(list(range(seed_pairs[i], seed_pairs[i + 1])))
+    i += 3
+
+    seed_to_soil, i = parse_map(input, i)
+    soil_to_fertilizer, i = parse_map(input, i)
+    fertilizer_to_water, i= parse_map(input, i)
+    water_to_light , i = parse_map(input, i)
+    light_to_temperature, i = parse_map(input, i)
+    temperature_to_humidity , i = parse_map(input, i)
+    humidity_to_location, i =parse_map(input, i)
+    
+    for sorted_map in [seed_to_soil, soil_to_fertilizer, \
+                    fertilizer_to_water, water_to_light, \
+                    light_to_temperature, temperature_to_humidity, \
+                    humidity_to_location]:
+        seeds = convert_arr(seeds, sorted_map)
+    return min(seeds)
