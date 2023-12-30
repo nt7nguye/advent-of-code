@@ -8,15 +8,10 @@ def predict(arr):
         stacked_arr.append(next_arr)
         arr = next_arr
     
-    stacked_arr[stacked_idx].append(0)
-    stacked_idx -= 1
-    while stacked_idx > -1:
-        stacked_arr[stacked_idx].append(
-            stacked_arr[stacked_idx + 1][-1] +
-            stacked_arr[stacked_idx][-1]
-        )
-        stacked_idx -= 1
-    return stacked_arr[0][-1]
+    diff = 0
+    for idx in range(stacked_idx - 1, -1, -1):
+        diff = stacked_arr[idx][0] - diff
+    return diff 
 
 def solve(input):
     total = 0
